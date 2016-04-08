@@ -1,7 +1,3 @@
-# Infinite Pirate Runner
-
-Infinite runner game (pirate themed!) made at the Baltimore Hackathon in 2015.
-
 ## Installation
 
 Install node.js
@@ -42,9 +38,6 @@ cd into the downloaded repo and run:
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
-## Credits
-
-Written by David Kramer and Matthew Hammel in one weekend.
 
 ## License
 
