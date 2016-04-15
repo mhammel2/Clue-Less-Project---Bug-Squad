@@ -18,3 +18,10 @@ var server = app.listen(8080, function () {
 
 //Use anything from this root folder
 app.use(express.static('.'));
+
+//catch 404 errors and forward to error handler
+app.use(function(req, res, next){
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
