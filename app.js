@@ -11,16 +11,32 @@ app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
-var allClients = {};
-allClients['d'] = [];
-var clientNum = 1;
+var players = [];
+var playerNum = 1;
 io.on('connection', function(socket){
-    console.log('User %s connected!', clientNum);
-    allClients['d'].push(clientNum);
-    clientNum++;
+    var player = {};
+    player.id = playerNum;
+    playerNum++;
+    player.socket = socket.id;
+    players.push(player);
+    console.log('Player %s connected!', player.id);
 
     socket.on('disconnect', function(){
-        console.log('User disconnected');
+        for (var i = 0; i < players.length; i++) {
+            if (players[i].socket == socket.id) {
+                console.log('Player %s disconnected! :(', players[i].id);
+                players.splice(i, 1);
+            }
+        }
+    });
+
+    socket.on('message', function(msg){
+        for (var i = 0; i < players.length; i++) {
+            if (players[i].socket == socket.id) {
+                io.emit('message', 'Player ' + players[i].id + ': ' + msg);
+            }
+        }
+
     });
 });
 
