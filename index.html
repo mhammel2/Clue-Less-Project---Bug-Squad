@@ -1,22 +1,234 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<title>Clue-less</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<!-- Includes -->
-		<script type="text/javascript" src="/phaser-2.4.3/build/phaser.min.js"></script>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="js/Boot.js"></script>
-		<script type="text/javascript" src="js/Preload.js"></script>
-		<script type="text/javascript" src="js/Game.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-		<script src="js/main.js"></script>
-		<script>var socket = io.connect();
-		</script>
-	</head>
-	<body>
-	</body> 
+<head>
+    <meta charset="utf-8" />
+    <title>Clue-less</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Includes -->
+    <script type="text/javascript" src="/phaser-2.4.3/build/phaser.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="js/Boot.js"></script>
+    <script type="text/javascript" src="js/Preload.js"></script>
+    <script type="text/javascript" src="js/Game.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/main.js"></script>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+<body>
+<div>
+    <ul id="messages"></ul>
+</div>
+
+<!--Drop down menu to select Character-->
+<div>
+    Select Character </br>
+    <select name = "characters" id = "myCharacter"></select>
+    <button type = "button" id ="join">Join Game!</button>
+</div>
+
+<!--The notepad for keep deducting an accusation-->
+<div class = "notepad">
+    Suspects </br>
+    <input type = "checkbox" /> Col. Mustard </br>
+    <input type = "checkbox" /> Professor Plub </br>
+    <input type = "checkbox" /> Mr. Green </br>
+    <input type = "checkbox" /> Mrs. Peakcock </br>
+    <input type = "checkbox" /> Miss Scarlet </br>
+    <input type = "checkbox" /> Mrs. White </br>
+    Weapons</br>
+    <input type = "checkbox" /> Knife </br>
+    <input type = "checkbox" /> Candlestick </br>
+    <input type = "checkbox" /> Revolver </br>
+    <input type = "checkbox" /> Rope </br>
+    <input type = "checkbox" /> Lead Pipe </br>
+    <input type = "checkbox" /> Wrench </br>
+    Room</br>
+    <input type = "checkbox" /> Hall </br>
+    <input type = "checkbox" /> Lounge </br>
+    <input type = "checkbox" /> Dining Room </br>
+    <input type = "checkbox" /> Kitchen </br>
+    <input type = "checkbox" /> Ballroom </br>
+    <input type = "checkbox" /> Conservatory </br>
+    <input type = "checkbox" /> Billiard Room </br>
+    <input type = "checkbox" /> Library </br>
+    <input type = "checkbox" /> Study </br>
+</div>
+
+<div class = "wrapper">
+    <button type = "input" id ="startGame" style = {display:block}>Start Game!</button>
+</div>
+
+<!--Place holder Board image-->
+<img src ="/public/Board.png" class = board>
+
+
+<!-- Right side panel-->
+<div class ="player-options">
+    <!--TODO: append hand of cards to this list-->
+
+    <div>
+        <ul id = "cards"></ul>
+    </div>
+    <!--List of Player status' to maintain a tally before utilizing a GUI-->
+    Player Status</br>
+    <table = "player-table">
+    <tr>
+        <td>Col. Mustard</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Professor Plub</td>
+        <td>           </td>
+    </tr>
+    <tr>
+        <td>Mr. Green</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Mrs. Peacock</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Miss Scarlet</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Mrs. White</td>
+        <td></td>
+    </tr>
+    </table>
+    Weapon Status </br>
+    <table = "weapon-table">
+    <tr>
+        <td>Knife</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Candlestick</td>
+        <td>           </td>
+    </tr>
+    <tr>
+        <td>Revolver</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Rope</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Sand Pipe</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Wrench</td>
+        <td></td>
+    </tr>
+    </table>
+    <form>
+        <!-- Drop down menus for moving and making accusations-->
+        <label for ="location">Move to:</label>
+        <select name = "location" id = "location">
+            <option value="hall">Hall</option>
+            <option value="lounge">Lounge</option>
+            <option value="dining-room">Dining Room</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="ballroom">Ballroom</option>
+            <option value="conservatory">Conservatory</option>
+            <option value="billiard">Billiard-Room</option>
+            <option value="library">Library</option>
+            <option value="study">Study</option>
+            <option value="hallway1">Hallway 1</option>
+            <option value="hallway2">Hallway 2</option>
+            <option value="hallway3">Hallway 3</option>
+            <option value="hallway4">Hallway 4</option>
+            <option value="hallway5">Hallway 5</option>
+            <option value="hallway6">Hallway 6</option>
+            <option value="hallway7">Hallway 7</option>
+            <option value="hallway8">Hallway 8</option>
+            <option value="hallway9">Hallway 9</option>
+            <option value="hallway10">Hallway 10</option>
+            <option value="hallway11">Hallway 11</option>
+            <option value="hallway12">Hallway 12</option>
+        </select>
+        <button type = "button">Move!</button>
+        </br>
+        <span style="display:inline-block">
+        <label for ="characters">Characters</label>
+    <select name = "characters" id = "characters">
+        <option value="mustard">Col. Mustard</option>
+        <option value="plub">Professor Plub</option>
+        <option value="green">Mr. Green</option>
+        <option value="peacock">Mrs. Peacock</option>
+        <option value="scarlet">Miss Scarlet</option>
+        <option value="white">Mrs. White</option>
+    </select>
+            </span>
+        <span style="display:inline-block">
+        <label for ="weapons">Weapons</label>
+        <select name = "weapons" id="weapons">
+            <option value="knife">Knife</option>
+            <option value="candlestick">Candlestick</option>
+            <option value="revolver">Revolver</option>
+            <option value="rope">Rope</option>
+            <option value="lead pipe">Lead Pipe</option>
+            <option value="wrench">Wrench</option>
+        </select>
+            </span>
+        </br>
+        <button type ="button">Make a suggestion!</button>
+        <button type ="button">Make an accusation!</button>
+    </form>
+</div>
+<!--
+    <form action="" class = "mbar">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form> -->
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    var socket = io();
+    $('form').submit(function(){
+        socket.emit('message', $('#m').val());
+        $('#m').val('');
+        return false;
+    });
+
+    //Scrolling update status bar
+    socket.on('message', function(msg){
+        $('#messages').prepend($('<li>').text(msg));
+    });
+
+    //Disable the start button until 6 players have connected
+    socket.on('gameReady', function(ready) {
+        if(ready == false)
+            $('#startGame').prop("disabled", true);
+        else
+            $('#startGame').prop("disabled", false);
+    });
+
+    //Append the list of Available players to the drop down menu
+    socket.on('viewPlayers', function(player){
+        $('#myCharacter').append($('<option>', {
+            value:player[0],
+            text:player[1]
+        }));
+    });
+
+    //Selecting a character functionality
+    $('#join').click(function() {
+        socket.emit('select-character',
+                $('#myCharacter option:selected').text());
+        $('#join').prop("disabled", true);
+        $('#myCharacter').prop("disabled", true);
+
+    });
+
+    //TODO: implement startGame functionality
+    $('#startGame').click(function() {
+        socket.emit('startGame');
+    })
+
+</script>
+</body>
 </html>
