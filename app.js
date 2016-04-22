@@ -5,23 +5,28 @@ var app = express();
 var path = require('path');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-
+populateDeck();
 //To initialize the game being off until we have four players
 var gameOn = false;
 
-//function used to populate the Board[] array of boardLocations
-populateBoard();
-populateDeck();
+
 // viewed at http://localhost:8080
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 //List of players to populate player select drop down menu
-var availPlayers = [['mustard', 'Col. Mustard',Mustard], ['plub', 'Professor Plub',Plub], ['green', 'Mr. Green',Green],
+var availPlayers = [['mustard', 'Col. Mustard', Mustard], ['plub', 'Professor Plub',Plub], ['green', 'Mr. Green',Green],
     ['peacock', 'Mrs. Peacock',Peacock], ['scarlet', 'Miss Scarlet',Scarlet], ['white', 'Mrs. White',White]];
 var players = [];
 var playerNum = 1;
+
+//setting up the cardset Object
+function CardSet(character, room, weapon){
+    this.character = character;
+    this.weapon = weapon;
+    this.room = room;
+}
 
 io.on('connection', function(socket){
     //First populate the available players to choose from.
@@ -46,6 +51,19 @@ io.on('connection', function(socket){
 
     //TODO: Implement start game functions
     socket.on('startGame', function() {
+        io.emit('message', 'New Game Started!');
+        //initializing the deck
+        var deck = populateDeck();
+        //function used to populate the Board[] array of boardLocations
+        var board = populateBoard();
+        //getting the random index variables for the solution
+        var characterIndex = Math.floor(Math.random() * 5);
+        var roomIndex = Math.floor(Math.random() * 8) + 6;
+        var weaponIndex = Math.floor(Math.random() * 5)+15;
+        var solution = new CardSet(deck[characterIndex],deck[roomIndex],deck[weaponIndex]);
+        io.emit('message', 'Solution: ' + solution.character.name + ' ' + solution.weapon.name + ' '
+        + solution.room.name);
+        game = new Game(board, solution);
 
     });
 
@@ -172,28 +190,51 @@ Room.prototype.constructor = Room;
 //creating all the room objects, the 1st parameter is the room ID
 //the third parameter are the IDs of its neighbor.  This logic will play later on
 function populateBoard() {
-    h1 = new Hallway(1, "Hallway 1", [13, 14]);
-    h2 = new Hallway(2, "Hallway 2", [14, 15]);
-    h3 = new Hallway(3, "Hallway 3", [15, 16]);
-    h4 = new Hallway(4, "Hallway 4", [16, 17]);
-    h5 = new Hallway(5, "Hallway 5", [17, 18]);
-    h6 = new Hallway(6, "Hallway 6", [18, 19]);
-    h7 = new Hallway(7, "Hallway 7", [19, 20]);
-    h8 = new Hallway(8, "Hallway 8", [20, 13]);
-    h9 = new Hallway(9, "Hallway 9", [14, 21]);
-    h10 = new Hallway(10, "Hallway 10", [16, 21]);
-    h11 = new Hallway(11, "Hallway 11", [18, 21]);
-    h12 = new Hallway(12, "Hallway 12", [20, 21]);
-    r13 = new Room(13, "Study", [1,2,9], 15);
-    r14 = new Room(14, "Hall", [1,8,17], 7);
-    r15 = new Room(15, "Lounge", [2,3,14], 8);
-    r16 = new Room(16, "Dining Room", [3,4,10], 9);
-    r17 = new Room(17, "Kitchen", [4,5,13], 10);
-    r18 = new Room(18, "Ballroom", [5,6,11], 11);
-    r19 = new Room(19, "Conservatory", [6,7,15], 12);
-    r20 = new Room(20, "Library", [7,8,12], 14);
-    r21 = new Room(21, "Billiard Room", [9,10,11,12], 13);
 
+    var board = [];
+    h0 = new Hallway(0, "Hallway 0", [12, 13]);
+    board.push(h0);
+    h1 = new Hallway(1, "Hallway 1", [13, 14]);
+    board.push(h1);
+    h2 = new Hallway(2, "Hallway 2", [14, 15]);
+    board.push(h2);
+    h3 = new Hallway(3, "Hallway 3", [15, 16]);
+    board.push(h3);
+    h4 = new Hallway(4, "Hallway 4", [16, 17]);
+    board.push(h4);
+    h5 = new Hallway(5, "Hallway 5", [17, 18]);
+    board.push(h5);
+    h6 = new Hallway(6, "Hallway 6", [18, 19]);
+    board.push(h6);
+    h7 = new Hallway(7, "Hallway 7", [19, 12]);
+    board.push(h7);
+    h8 = new Hallway(8, "Hallway 8", [13, 20]);
+    board.push(h8);
+    h9 = new Hallway(9, "Hallway 9", [15, 20]);
+    board.push(h9);
+    h10 = new Hallway(10, "Hallway 10", [17, 20]);
+    board.push(h10);
+    h11 = new Hallway(11, "Hallway 11", [19, 20]);
+    board.push(h11);
+    r12 = new Room(12, "Study", [0,1,8], 15);
+    board.push(r12);
+    r13 = new Room(13, "Hall", [0,7,16], 7);
+    board.push(r13);
+    r14 = new Room(14, "Lounge", [1,2,13], 8);
+    board.push(r14);
+    r15 = new Room(15, "Dining Room", [2,3,9], 9);
+    board.push(r15);
+    r16 = new Room(16, "Kitchen", [3,4,12], 10);
+    board.push(r16);
+    r17 = new Room(17, "Ballroom", [4,5,10], 11);
+    board.push(r17);
+    r18 = new Room(18, "Conservatory", [5,6,14], 12);
+    board.push(r18);
+    r19 = new Room(19, "Library", [6,7,11], 14);
+    board.push(r19);
+    r20 = new Room(20, "Billiard Room", [8,9,10,11], 13);
+    board.push(r20);
+    return board;
 }
 
 
@@ -214,11 +255,17 @@ Card.prototype = {
 };
 
 //function subclass
-function Weapon() {}
+function Weapon(id, name) {
+    this.id = id;
+    this.name = name;
+}
 Weapon.prototype = Object.create(Card.prototype);
 
 //location subclass
-function Location(){}
+function Location(id, name){
+    this.id = id;
+    this.name = name;
+}
 Location.prototype = Object.create(Card.prototype);
 
 
@@ -231,22 +278,23 @@ function Character(id,name,location)
 Character.prototype = Object.create(Card.prototype);
 
 
+
 //populating the deck with card objects
 //to provide random weapon/character/location cards, we can randomize
 //the through the indices 0-5 for Character,6-15 for Location, and 15-21 for Weapon
 function populateDeck() {
     var deck = [];
-    Mustard = new Character(id = 1, name = "Col. Mustard", 3);
+    Mustard = new Character(id = 1, name = "Col. Mustard", 2);
     deck.push(Mustard);
-    Plub = new Character(id = 2, name = "Professor Plub", 8);
+    Plub = new Character(id = 2, name = "Professor Plub", 7);
     deck.push(Plub);
-    Green = new Character(id = 3, name = "Mr. Green", 6);
+    Green = new Character(id = 3, name = "Mr. Green", 5);
     deck.push(Green);
-    Peacock = new Character(id = 4, name = "Mrs. Peacock", 7);
+    Peacock = new Character(id = 4, name = "Mrs. Peacock", 6);
     deck.push(Peacock);
-    Scarlet = new Character(id = 5, name = "Miss Scarlet", 2);
+    Scarlet = new Character(id = 5, name = "Miss Scarlet", 1);
     deck.push(Scarlet);
-    White = new Character(id = 6, name = "Mrs. White", 5);
+    White = new Character(id = 6, name = "Mrs. White", 4);
     deck.push(White);
     Hall = new Location(id = 7, name = "Hall", Plub);
     deck.push(Hall);
@@ -278,4 +326,44 @@ function populateDeck() {
     deck.push(Lead_Pipe);
     Wrench = new Weapon(id = 21, name = "Wrench");
     deck.push(Wrench);
+    return deck;
 }
+
+function Game (board, solution) {
+    this.board = board;
+    this.solution = solution;
+    solution.isEqual = function(c,r,w){
+        return (solution.weapon.id == w.id && solution.character.id == c.id && solution.room.id == r.id);
+    };
+}
+
+//Creating the Player Object
+Game.prototype = {
+    constructor: Game,
+
+    processMove: function () {
+    },
+
+    //Assuming this is an authorized move, this removes the player from the old room
+    //and adds him to the new room.  Hallways will remove the player, rooms will append/splice
+    processResponse: function () {
+    },
+
+    processSuggestion: function (CardSet) {
+    },
+
+    processAccusation: function (CardSet) {
+    },
+
+    compareToSolution: function (CardSet) {
+        return solution.isEqual(CardSet.character, CardSet.room, CardSet.weapon);
+    },
+
+    update: function () {
+
+    },
+
+    updateGameOver: function () {
+    }
+
+};
