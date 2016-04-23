@@ -16,7 +16,7 @@ app.get('/', function(req, res) {
 });
 
 //List of players to populate player select drop down menu
-var availPlayers = [['mustard', 'Col. Mustard', Mustard], ['plub', 'Professor Plub',Plub], ['green', 'Mr. Green',Green],
+var availPlayers = [['mustard', 'Col. Mustard', Mustard], ['plum', 'Professor Plum',Plum], ['green', 'Mr. Green',Green],
     ['peacock', 'Mrs. Peacock',Peacock], ['scarlet', 'Miss Scarlet',Scarlet], ['white', 'Mrs. White',White]];
 var players = [];
 var playerNum = 1;
@@ -49,23 +49,7 @@ io.on('connection', function(socket){
         }
     });
 
-    //TODO: Implement start game functions
-    socket.on('startGame', function() {
-        io.emit('message', 'New Game Started!');
-        //initializing the deck
-        var deck = populateDeck();
-        //function used to populate the Board[] array of boardLocations
-        var board = populateBoard();
-        //getting the random index variables for the solution
-        var characterIndex = Math.floor(Math.random() * 5);
-        var roomIndex = Math.floor(Math.random() * 8) + 6;
-        var weaponIndex = Math.floor(Math.random() * 5)+15;
-        var solution = new CardSet(deck[characterIndex],deck[roomIndex],deck[weaponIndex]);
-        io.emit('message', 'Solution: ' + solution.character.name + ' ' + solution.weapon.name + ' '
-        + solution.room.name);
-        game = new Game(board, solution);
 
-    });
 
     /**  Original messaging code lines left in
     socket.on('message', function(msg){
@@ -84,7 +68,7 @@ io.on('connection', function(socket){
         //If 6 or more players are connected.  The game is ready to start
 
         //Creating a new player instance
-        var player = new Player(playerNum, msg, null, socket.id);
+        var player = new Player(playerNum, msg, socket.id);
         playerNum++;
         players.push(player);
         console.log('Player %s connected!', player.id);
@@ -104,6 +88,75 @@ io.on('connection', function(socket){
         }
 
     });
+
+    //TODO: Implement start game functions
+    socket.on('startGame', function() {
+        io.emit('message', 'New Game Started!');
+        //initializing the deck
+        var deck = populateDeck();
+        //function used to populate the Board[] array of boardLocations
+        var board = populateBoard();
+        //getting the random index variables for the solution
+        var characterIndex = Math.floor(Math.random() * 5);
+        var roomIndex = Math.floor(Math.random() * 8) + 6;
+        var weaponIndex = Math.floor(Math.random() * 5)+15;
+        var solution = new CardSet(deck[characterIndex],deck[roomIndex],deck[weaponIndex]);
+
+
+        //broadcasting the solution message, to be deleted later
+        io.emit('message', 'Solution: ' + solution.character.name + ' ' + solution.weapon.name + ' '
+            + solution.room.name);
+
+
+        //Remove the solution cards, then shuffle the cards and pass them to the players
+        deck.splice(characterIndex,1);
+        deck.splice(weaponIndex,1);
+        deck.splice(roomIndex, 1);
+
+        shuffle(deck);
+
+        for(var i = 0; i < 6; deck++)
+        {
+            for(var j = 0; j < 3; j++ )
+            {
+                players[i].hand.push(deck.pop());
+            }
+        }
+
+        //populate the rooms with the starting locations
+        Scarlet.location = board[1];
+        board[1].addPlayer(Scarlet);
+        Mustard.location = board[2];
+        board[2].addPlayer(Mustard);
+        White.location = board[4];
+        board[4].addPlayer(White);
+        Green.location = board[5];
+        board[5].addPlayer(Green);
+        Peacock.location = board[6];
+        board[6].addPlayer(Peacock);
+        Plum.location = board[7];
+        board[7].addPlayer(Plum);
+
+        //setting up the weapons
+        var weapons = [];
+        //lead pipe
+        //revolver
+        //candlestick
+        //rope
+        //knife
+        //wrench
+        weapons.push(new Weapon_Piece("lead pipe", board[13]));
+        weapons.push(new Weapon_Piece("revolver", board[14]));
+        weapons.push(new Weapon_Piece("candlestick", board[16]));
+        weapons.push(new Weapon_Piece("rope", board[17]));
+        weapons.push(new Weapon_Piece("knife", board[13]));
+        weapons.push(new Weapons_Piece("wrench", board[19]));
+
+        game = new Game(board, solution);
+
+
+
+    });
 });
 
 server.listen(8080, function () {
@@ -116,10 +169,10 @@ server.listen(8080, function () {
 //Use anything from this root folder
 app.use(express.static('.'));
 
-function Player (id, character, hand, socket) {
+function Player (id, character, socket) {
     this.id = id;
     this.character = character;
-    this.hand = hand;
+    this.hand = [];
     this.socket = socket;
 }
 
@@ -159,12 +212,16 @@ function BoardLocation(id, name, neighbors){
     this.id = id;
     this.name = name;
     this.neighbors = neighbors;
+
 }
 
 //Creating the subclass Hallway
 function Hallway(){
     this.isFilled = false;
     var player;
+    this.addPlayer = function(player){
+        this.player = player;
+    }
 }
 
 //The Room subclass
@@ -174,6 +231,11 @@ function Room(id, name, neighbors, associatedCard){
     this.name = name;
     this.neighbors = neighbors;
     this.associatedCard = associatedCard;
+    this.addPlayer = function(player)
+    {
+        players.push(player);
+    }
+
 
 }
 
@@ -238,6 +300,14 @@ function populateBoard() {
 }
 
 
+//creating the weapon piece object
+function Weapon_Piece(name, location)
+{
+    this.name = name;
+    this.location = location;
+}
+
+
 //creating the card object
 function Card(id, name)
 {
@@ -253,6 +323,7 @@ Card.prototype = {
         return this.name === name;
     }
 };
+
 
 //function subclass
 function Weapon(id, name) {
@@ -286,8 +357,8 @@ function populateDeck() {
     var deck = [];
     Mustard = new Character(id = 1, name = "Col. Mustard", 2);
     deck.push(Mustard);
-    Plub = new Character(id = 2, name = "Professor Plub", 7);
-    deck.push(Plub);
+    Plum = new Character(id = 2, name = "Professor Plum", 7);
+    deck.push(Plum);
     Green = new Character(id = 3, name = "Mr. Green", 5);
     deck.push(Green);
     Peacock = new Character(id = 4, name = "Mrs. Peacock", 6);
@@ -296,7 +367,7 @@ function populateDeck() {
     deck.push(Scarlet);
     White = new Character(id = 6, name = "Mrs. White", 4);
     deck.push(White);
-    Hall = new Location(id = 7, name = "Hall", Plub);
+    Hall = new Location(id = 7, name = "Hall", Plum);
     deck.push(Hall);
     Lounge = new Location(id = 8, name = "Lounge");
     deck.push(Lounge);
@@ -367,3 +438,23 @@ Game.prototype = {
     }
 
 };
+
+//Knuth Shuffle, used to shuffle an array
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
