@@ -71,94 +71,23 @@
     <div>
         <ul id = "cards"></ul>
     </div>
-    <!--List of Player status' to maintain a tally before utilizing a GUI-->
-    Player Status</br>
-    <table = "player-table">
-    <tr>
-        <td>Col. Mustard</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Professor Plub</td>
-        <td>           </td>
-    </tr>
-    <tr>
-        <td>Mr. Green</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Mrs. Peacock</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Miss Scarlet</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Mrs. White</td>
-        <td></td>
-    </tr>
-    </table>
-    Weapon Status </br>
-    <table = "weapon-table">
-    <tr>
-        <td>Knife</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Candlestick</td>
-        <td>           </td>
-    </tr>
-    <tr>
-        <td>Revolver</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Rope</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Sand Pipe</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Wrench</td>
-        <td></td>
-    </tr>
-    </table>
+    <!--Dynamically create update tables here status' to maintain a tally before utilizing a GUI-->
+    <div id = "weaponTable"></div>
+    <div id = "characterTable"></div>
+    Your Current Hand </br>
+    <select name = "myHand" id = "myHand"></select>
+    <button type = "input" id ="disproveButton">Disprove!</button>
     <form>
         <!-- Drop down menus for moving and making accusations-->
         <label for ="location">Move to:</label>
-        <select name = "location" id = "location">
-            <option value="hall">Hall</option>
-            <option value="lounge">Lounge</option>
-            <option value="dining-room">Dining Room</option>
-            <option value="kitchen">Kitchen</option>
-            <option value="ballroom">Ballroom</option>
-            <option value="conservatory">Conservatory</option>
-            <option value="billiard">Billiard-Room</option>
-            <option value="library">Library</option>
-            <option value="study">Study</option>
-            <option value="hallway1">Hallway 1</option>
-            <option value="hallway2">Hallway 2</option>
-            <option value="hallway3">Hallway 3</option>
-            <option value="hallway4">Hallway 4</option>
-            <option value="hallway5">Hallway 5</option>
-            <option value="hallway6">Hallway 6</option>
-            <option value="hallway7">Hallway 7</option>
-            <option value="hallway8">Hallway 8</option>
-            <option value="hallway9">Hallway 9</option>
-            <option value="hallway10">Hallway 10</option>
-            <option value="hallway11">Hallway 11</option>
-            <option value="hallway12">Hallway 12</option>
-        </select>
-        <button type = "button">Move!</button>
+        <select name = "location" id = "location"></select>
+        <button type = "button" id="moveButton">Move!</button>
         </br>
         <span style="display:inline-block">
         <label for ="characters">Characters</label>
     <select name = "characters" id = "characters">
         <option value="mustard">Col. Mustard</option>
-        <option value="plub">Professor Plub</option>
+        <option value="plum">Professor Plum</option>
         <option value="green">Mr. Green</option>
         <option value="peacock">Mrs. Peacock</option>
         <option value="scarlet">Miss Scarlet</option>
@@ -207,12 +136,72 @@
             $('#startGame').prop("disabled", false);
     });
 
+    //Dynamically create the update table with weapon locations
+    socket.on('updateWeapons', function(weapons) {
+        $('#messages').prepend($('<li>').text('Updating the weapon locations'));
+        $('#weaponTable' ).empty();
+        $('#weaponTable').append('<table></table>');
+        var table = $('#weaponTable').children();
+        table.append("<tr><td>Weapon</td><td>Location</td></tr>");
+        for(var i =0; i<weapons.length; i++){
+            var row = "<tr>";
+            row+="<td>" + weapons[i].name + "</td>" +
+                    "<td>" + weapons[i].location.name + "</td>";
+            row+="</tr>";
+            table.append(row);
+
+        }
+    });
+    //Dynamically update characterTablw with character locations
+    socket.on('updateCharacters', function(characters){
+        $('#messages').prepend($('<li>').text('Updating the character locations'));
+        $('#characterTable' ).empty();
+        $('#characterTable').append('<table></table>');
+        var table = $('#characterTable').children();
+        table.append("<tr><td>Character</td><td>Location</td></tr>");
+        for(var i =0; i<characters.length; i++){
+            var row = "<tr>";
+            row+="<td>" + characters[i].name + "</td>" +
+                    "<td>" + characters[i].location.name + "</td>";
+            row+="</tr>";
+            table.append(row);
+
+        }
+    });
     //Append the list of Available players to the drop down menu
     socket.on('viewPlayers', function(player){
         $('#myCharacter').append($('<option>', {
             value:player[0],
             text:player[1]
         }));
+    });
+
+    //populate the players hand on the screen
+    socket.on('deck', function(hand) {
+        for (i = 0; i < hand.length; i++){
+            $('#myHand').append($('<option>', {
+                value:hand[i].name,
+                text:hand[i].name
+            }));
+
+        }
+    });
+
+    //Populating the moveTo menu
+    socket.on('makeMove', function(rooms) {
+        for(i = 0; i <rooms.length; i++) {
+            $('#location').append($('<option>', {
+                value: rooms[i].id,
+                text: rooms[i].name
+            }));
+        }
+    });
+
+    //send the id of the room to move the player to
+    $('#moveButton').click(function() {
+        socket.emit('movePlayer', $('#location').val());
+        $('#location').empty();
+
     });
 
     //Selecting a character functionality
@@ -222,6 +211,11 @@
         $('#join').prop("disabled", true);
         $('#myCharacter').prop("disabled", true);
 
+    });
+
+    //Setting up the disprove button to broadcast their chosen card
+    $('#disproveButton').click(function() {
+        socket.emit('disprove', $('#myHand option:selected').text());
     });
 
     //TODO: implement startGame functionality
