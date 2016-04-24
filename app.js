@@ -16,10 +16,16 @@ app.get('/', function(req, res) {
 });
 
 //List of players to populate player select drop down menu
-var availPlayers = [['mustard', 'Col. Mustard', Mustard], ['plub', 'Professor Plub',Plub], ['green', 'Mr. Green',Green],
+var availPlayers = [['mustard', 'Col. Mustard', Mustard], ['plum', 'Professor Plum',Plum], ['green', 'Mr. Green',Green],
     ['peacock', 'Mrs. Peacock',Peacock], ['scarlet', 'Miss Scarlet',Scarlet], ['white', 'Mrs. White',White]];
 var players = [];
 var playerNum = 1;
+//arrays used to populate the update tables
+var characters = [];
+var weapons = [];
+
+//count to track the turns
+var count = 0;
 
 //setting up the cardset Object
 function CardSet(character, room, weapon){
@@ -49,23 +55,7 @@ io.on('connection', function(socket){
         }
     });
 
-    //TODO: Implement start game functions
-    socket.on('startGame', function() {
-        io.emit('message', 'New Game Started!');
-        //initializing the deck
-        var deck = populateDeck();
-        //function used to populate the Board[] array of boardLocations
-        var board = populateBoard();
-        //getting the random index variables for the solution
-        var characterIndex = Math.floor(Math.random() * 5);
-        var roomIndex = Math.floor(Math.random() * 8) + 6;
-        var weaponIndex = Math.floor(Math.random() * 5)+15;
-        var solution = new CardSet(deck[characterIndex],deck[roomIndex],deck[weaponIndex]);
-        io.emit('message', 'Solution: ' + solution.character.name + ' ' + solution.weapon.name + ' '
-        + solution.room.name);
-        game = new Game(board, solution);
 
-    });
 
     /**  Original messaging code lines left in
     socket.on('message', function(msg){
@@ -84,16 +74,12 @@ io.on('connection', function(socket){
         //If 6 or more players are connected.  The game is ready to start
 
         //Creating a new player instance
-        var player = new Player(playerNum, msg, null, socket.id);
+        var player = new Player(playerNum, msg, socket.id);
         playerNum++;
-        players.push(player);
+
         console.log('Player %s connected!', player.id);
 
-        //Can't start unless 6 players
-        if(players.length >= 6)
-            io.emit('gameReady', true);
-        else
-            io.emit('gameReady', false);
+
 
         //remove the chosen character from the drop down menu
         for(var j = 0; j < availPlayers.length; j++) {
@@ -102,8 +88,169 @@ io.on('connection', function(socket){
                 availPlayers.splice(j--, 1);
             }
         }
+        players.push(player);
+
+        //Can't start unless 6 players
+        if(players.length >= 6)
+            io.emit('gameReady', true);
+        else
+            io.emit('gameReady', false);
 
     });
+
+    //function to broadcast a disproved card
+    socket.on('disprove', function(msg){
+        io.emit('message', msg + ' has been used to disprove the suggestion!');
+    });
+
+    //TODO: Implement start game functions
+    socket.on('startGame', function() {
+        io.emit('message', 'New Game Started!');
+        //initializing the deck
+        var deck = populateDeck();
+        //function used to populate the Board[] array of boardLocations
+        board = populateBoard();
+        //getting the random index variables for the solution
+        var characterIndex = Math.floor(Math.random() * 5);
+        var roomIndex = Math.floor(Math.random() * 8) + 6;
+        var weaponIndex = Math.floor(Math.random() * 5)+15;
+        var solution = new CardSet(deck[characterIndex],deck[roomIndex],deck[weaponIndex]);
+
+        //broadcasting the solution message, to be deleted later
+        io.emit('message', 'Solution: ' + solution.character.name + ' ' + solution.weapon.name + ' '
+            + solution.room.name);
+
+
+        //Remove the solution cards, then shuffle the cards and pass them to the players
+        deck.splice(characterIndex,1);
+        deck.splice(weaponIndex,1);
+        deck.splice(roomIndex, 1);
+
+        shuffle(deck);
+
+        //passing the three cards to the players
+        for(var i = 0; i < 6; i++)
+        {
+            for(var j = 0; j < 3; j++ )
+            {
+                players[i].hand.push(deck.pop());
+            }
+        }
+
+        //populating the players hands on their screens
+        for(var i = 0; i < 6; i++)
+        {
+            io.to(players[i].socket).emit('deck',players[i].hand);
+        }
+
+
+
+
+        //populate the rooms with the starting locations
+        players[0].character.location = board[players[0].character.locationID];
+        players[1].character.location = board[players[1].character.locationID];
+        players[2].character.location = board[players[2].character.locationID];
+        players[3].character.location = board[players[3].character.locationID];
+        players[4].character.location = board[players[4].character.locationID];
+        players[5].character.location = board[players[5].character.locationID];
+        board[1].addPlayer(Scarlet);
+
+        board[2].addPlayer(Mustard);
+
+        board[4].addPlayer(White);
+
+        board[5].addPlayer(Green);
+
+        board[6].addPlayer(Peacock);
+
+        board[7].addPlayer(Plum);
+
+        weapons.push(new Weapon_Piece("lead pipe", board[13]));
+        weapons.push(new Weapon_Piece("revolver", board[14]));
+        weapons.push(new Weapon_Piece("candlestick", board[16]));
+        weapons.push(new Weapon_Piece("rope", board[17]));
+        weapons.push(new Weapon_Piece("knife", board[13]));
+        weapons.push(new Weapon_Piece("wrench", board[19]));
+
+        io.emit('updateWeapons', weapons);
+        io.emit('updateCharacters', characters);
+
+        game = new Game(board, solution);
+        updateGame();
+
+
+    });
+
+    //Method to move a player
+    socket.on('movePlayer', function(id){
+        console.log('Move Player being called');
+        //getting the id to identify a player
+        var playerID = socket.id;
+        var index = 0;
+        for(index = 0; index < players.length; index++)
+        {
+            if(players[index].socket == playerID)
+                break;
+        }
+        io.emit('message', players[index].character.name + ' moves to ' + board[id].name);
+
+        //updating the rooms
+        board[players[index].character.locationID].removePlayer(players[index].character);
+        players[index].character.updateLocation(board, id);
+        board[id].addPlayer(players[index].character);
+        updateGame();
+
+    });
+
+    //Update the character and weapon tables on the client page
+    var updateGame = function()
+    {
+        characters = [];
+         for(var i = 0; i< players.length; i++)
+         {
+            characters.push(players[i].character);
+         }
+           io.emit('updateWeapons', weapons);
+           io.emit('updateCharacters', characters);
+        gameLoop();
+    };
+
+    //gameLoop to prompt users to make a move
+    var gameLoop = function() {
+            if(count == 6)
+                count = 0;
+
+            //To populate the list of available rooms to the active player
+            var rooms = [];
+            moveableRooms = board[players[count].character.locationID].neighbors;
+            for(var j = 0; j < moveableRooms.length; j++){
+                //If the room is not full, push it to the available options
+                if(!board[moveableRooms[j].isFull])
+                {
+                    rooms.push(board[moveableRooms[j]]);
+                }
+            }
+            //If there are no rooms to move into, the player loses a turn
+            if(rooms.length ==0){
+                io.emit('message', players[count].character.name + ' losses a turn.  No available moves');
+                count++;
+                gameLoop();
+            }
+                //populate the makeMove dropdown menu
+            else {
+                io.to(players[count++].socket).emit('makeMove', rooms);
+            }
+    };
+
+    var makeAccusation = function () {
+
+    };
+
+    var makeSuggestion = function () {
+
+    };
+
+
 });
 
 server.listen(8080, function () {
@@ -116,10 +263,10 @@ server.listen(8080, function () {
 //Use anything from this root folder
 app.use(express.static('.'));
 
-function Player (id, character, hand, socket) {
+function Player (id, character, socket) {
     this.id = id;
     this.character = character;
-    this.hand = hand;
+    this.hand = [];
     this.socket = socket;
 }
 
@@ -132,18 +279,7 @@ Player.prototype = {
     //Assuming this is an authorized move, this removes the player from the old room
     //and adds him to the new room.  Hallways will remove the player, rooms will append/splice
     move:function(oldRoom, newRoom) {
-        if(oldRoom instanceof Hallway)
-            oldRoom.player = null;
-        else
-        {
-            var i = oldRoom.players.indexOf(player);
-            oldRoom.players.splice(i,1);
-        }
 
-        if(newRoom instanceof Hallway)
-            newRoom.player = player;
-        else
-            newRoom.players.push(player);
     },
 
     makeSuggestion: function(){},
@@ -159,12 +295,23 @@ function BoardLocation(id, name, neighbors){
     this.id = id;
     this.name = name;
     this.neighbors = neighbors;
+
 }
 
 //Creating the subclass Hallway
-function Hallway(){
-    this.isFilled = false;
+function Hallway(id, name, neighbors){
+    this.id = id;
+    this.name = name;
+    this.neighbors = neighbors;
+    this.isFull = false;
     var player;
+    this.addPlayer = function(player){
+        this.player = player;
+        this.isFull = true;
+    };
+    this.removePlayer = function(player){
+        this.isFull = false;
+    };
 }
 
 //The Room subclass
@@ -172,9 +319,17 @@ function Room(id, name, neighbors, associatedCard){
     var players = [];
     this.id = id;
     this.name = name;
+    this.isFull = false;
     this.neighbors = neighbors;
     this.associatedCard = associatedCard;
-
+    this.addPlayer = function(player)
+    {
+        players.push(player);
+    };
+    this.removePlayer = function(player){
+        var i = players.indexOf(player);
+        players.splice(i,1);
+    }
 }
 
 //Hallway inheriting BoardLocation
@@ -220,7 +375,7 @@ function populateBoard() {
     board.push(r12);
     r13 = new Room(13, "Hall", [0,7,16], 7);
     board.push(r13);
-    r14 = new Room(14, "Lounge", [1,2,13], 8);
+    r14 = new Room(14, "Lounge", [1,2,18], 8);
     board.push(r14);
     r15 = new Room(15, "Dining Room", [2,3,9], 9);
     board.push(r15);
@@ -235,6 +390,14 @@ function populateBoard() {
     r20 = new Room(20, "Billiard Room", [8,9,10,11], 13);
     board.push(r20);
     return board;
+}
+
+
+//creating the weapon piece object
+function Weapon_Piece(name, location)
+{
+    this.name = name;
+    this.location = location;
 }
 
 
@@ -254,6 +417,7 @@ Card.prototype = {
     }
 };
 
+
 //function subclass
 function Weapon(id, name) {
     this.id = id;
@@ -268,12 +432,19 @@ function Location(id, name){
 }
 Location.prototype = Object.create(Card.prototype);
 
-
-function Character(id,name,location)
+//creating the Character object
+function Character(id,name,locationID)
 {
     this.id = id;
     this.name = name;
-    this.location = location;
+    this.locationID = locationID;
+    var location;
+    this.updateLocation = function(board, id)
+    {
+        this.locationID = id;
+        this.location = board[id];
+    };
+
 }
 Character.prototype = Object.create(Card.prototype);
 
@@ -286,8 +457,8 @@ function populateDeck() {
     var deck = [];
     Mustard = new Character(id = 1, name = "Col. Mustard", 2);
     deck.push(Mustard);
-    Plub = new Character(id = 2, name = "Professor Plub", 7);
-    deck.push(Plub);
+    Plum = new Character(id = 2, name = "Professor Plum", 7);
+    deck.push(Plum);
     Green = new Character(id = 3, name = "Mr. Green", 5);
     deck.push(Green);
     Peacock = new Character(id = 4, name = "Mrs. Peacock", 6);
@@ -296,7 +467,7 @@ function populateDeck() {
     deck.push(Scarlet);
     White = new Character(id = 6, name = "Mrs. White", 4);
     deck.push(White);
-    Hall = new Location(id = 7, name = "Hall", Plub);
+    Hall = new Location(id = 7, name = "Hall", Plum);
     deck.push(Hall);
     Lounge = new Location(id = 8, name = "Lounge");
     deck.push(Lounge);
@@ -341,29 +512,28 @@ function Game (board, solution) {
 Game.prototype = {
     constructor: Game,
 
-    processMove: function () {
-    },
-
-    //Assuming this is an authorized move, this removes the player from the old room
-    //and adds him to the new room.  Hallways will remove the player, rooms will append/splice
-    processResponse: function () {
-    },
-
-    processSuggestion: function (CardSet) {
-    },
-
-    processAccusation: function (CardSet) {
-    },
-
     compareToSolution: function (CardSet) {
         return solution.isEqual(CardSet.character, CardSet.room, CardSet.weapon);
-    },
-
-    update: function () {
-
-    },
-
-    updateGameOver: function () {
     }
 
 };
+
+//Knuth Shuffle, used to shuffle an array
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+}
