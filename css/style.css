@@ -8,6 +8,15 @@ body {
     font: 13px Helvetica, Arial;
 }
 
+.suggestionButton {
+
+}
+
+.accusationButton{
+
+}
+
+
 .board {
     display: inline;
 }
