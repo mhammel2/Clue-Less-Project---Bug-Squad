@@ -14,22 +14,40 @@
     <script type="text/javascript" src="js/Game.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="js/main.js"></script>
+    
 </head>
 <script src="/socket.io/socket.io.js"></script>
+
 <body>
-<div>
-    <ul id="messages"></ul>
-</div>
+<img src="css/images/banner.png" style="    display: block;
+    margin: 0 auto;">
+<div style="position:relative;    margin: auto;
+top: 5px;
+    width: 1045px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 3px solid #454545;
+    padding: 10px;">
 
 <!--Drop down menu to select Character-->
-<div>
-    Select Character </br>
-    <select name = "characters" id = "myCharacter"></select>
+<div class= "player-game-options" style="padding:5px;">
+<div class="notepad" style="width:150px; padding:5px; display:inline-block">
+    <b>Select Character</b> </br>
+    <select name = "characters" id = "myCharacter"></select><br>
     <button type = "button" id ="join">Join Game!</button>
 </div>
+</div>
 
+
+<div style="padding:5px;">
+<div class="notepad" style="width:150px; padding:5px; display:inline-block">
+     <button type = "input" id = "startGame" >Start Game!</button><br><br>
+      <button type = "input" id = "startGame" >Restart Game!</button>
+</div></div>
+<img src ="/public/Board.png" style = "display:inline-block; ">
 <!--The notepad for keep deducting an accusation-->
-<div class = "notepad">
+<div class="player-game-options">
+<div class = "notepad" style="width:150px;display:inline-block;">
+	<b>Detective Notes</b><br><br>
     Suspects </br>
     <input type = "checkbox" /> Col. Mustard </br>
     <input type = "checkbox" /> Professor Plub </br>
@@ -55,17 +73,12 @@
     <input type = "checkbox" /> Library </br>
     <input type = "checkbox" /> Study </br>
 </div>
-
-<div class = "wrapper">
-    <button type = "input" id ="startGame" style = {display:block}>Start Game!</button>
 </div>
-
-<!--Place holder Board image-->
-<img src ="/public/Board.png" class = board>
 
 
 <!-- Right side panel-->
-<div class ="player-options">
+
+<div class ="notepad" style="width:150px; padding:5px; position:absolute; left: 875px; top: 5px;">
     <!--TODO: append hand of cards to this list-->
 
     <div>
@@ -109,7 +122,13 @@
         <button type ="button" id="suggestionButton" disabled = "disabled">Make a suggestion!</button>
         <button type ="button" id="accusationButton" disabled = "disabled">Make an accusation!</button>
     </form>
-</div>
+    </div>
+
+
+
+<!--Place holder Board image-->
+
+
 <!--
     <form action="" class = "mbar">
         <input id="m" autocomplete="off" /><button>Send</button>
@@ -258,5 +277,11 @@
     })
 
 </script>
+<div class = "messages">
+	<div style="text-align:center"><b>Server Messages</b></div>
+    <ul id="messages"></ul>
+</div>
+</div>
+
 </body>
 </html>
