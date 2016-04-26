@@ -36,11 +36,12 @@ function CardSet(character, room, weapon){
 
 io.on('connection', function(socket){
     //First populate the available players to choose from.
+    io.emit('resetPlayers');
     for(var i = 0; i < availPlayers.length; i++)
         io.emit('viewPlayers', availPlayers[i]);
     
-    //Not ready unless 6 players are playing
-    if(players.length >= 6)
+    //Not ready unless 3-6 players are playing
+    if(players.length >= 3  && players.length <= 6)
         io.emit('gameReady', true);
     else
         io.emit('gameReady', false);
@@ -88,8 +89,8 @@ io.on('connection', function(socket){
         }
         players.push(player);
 
-        //Can't start unless 6 players
-        if(players.length >= 6)
+        //Can't start unless there are 3-6 players
+        if(players.length >= 3  && players.length <= 6)
             io.emit('gameReady', true);
         else
             io.emit('gameReady', false);
