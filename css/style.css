@@ -6,8 +6,19 @@
 
 body {
     font: 13px Helvetica, Arial;
+	color:				#DDDDDD;
+	background:			black url(images/background.jpg) top left no-repeat;
+	
 }
 
+headerimg {
+	position: 			relative;
+	top: 				40px;
+	float:				left;
+	 background-position: 100% 100%;
+   background-repeat: no-repeat;
+	
+}
 .suggestionButton {
 
 }
@@ -18,17 +29,24 @@ body {
 
 
 .board {
-    display: inline;
+    display: block;
+    margin: 0 auto;
 }
 .startGame{
 
 }
 .player-options{
     float:right;
+	padding: 5px;
+}
+
+.player-game-options{
+    float:left;
+	padding: 5px;
 }
 
 .wrapper {
-    text-align: center;
+    display:inline;
 }
 .mbar {
     background: #000;
@@ -47,9 +65,18 @@ table, td, th {
     border: 1px solid black;
 }
 .notepad {
-background: #2a85a0;
-    width: 200px;
-    float: left;
+	padding: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+	max-width: 150px;
+	
+}
+
+.messages {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+	padding: 5px;
+
 }
 label{
     display:block;
@@ -62,7 +89,7 @@ form input {
 }
 
 #messages {
-    height: 60px;
+    height: 150px;
     overflow: hidden;
     overflow-y: scroll;
     margin: 0;
@@ -76,3 +103,4 @@ form input {
 #messages li:nth-child(odd) {
     background: #eee;
 }
+
