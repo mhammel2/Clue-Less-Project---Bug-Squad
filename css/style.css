@@ -78,6 +78,12 @@ table, td, th {
 	padding: 5px;
 
 }
+.chatBox {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+	padding: 5px;
+
+}
 label{
     display:block;
 }
@@ -89,7 +95,7 @@ form input {
 }
 
 #messages {
-    height: 150px;
+    height: 100px;
     overflow: hidden;
     overflow-y: scroll;
     margin: 0;
@@ -101,6 +107,22 @@ form input {
 }
 
 #messages li:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+#chatBox {
+    height: 100px;
+    overflow: hidden;
+    overflow-y: scroll;
+    margin: 0;
+    padding: 0;
+}
+
+#chatBox li {
+    padding: 5px 10px;
+}
+
+#chatBox li:nth-child(odd) {
     background: rgba(0, 0, 0, 0.8);
 }
 

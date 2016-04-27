@@ -201,10 +201,21 @@ window.onclick = function(event) {
         $('#m').val('');
         return false;
     });
+	
+	    $('form').submit(function(){
+        socket.emit('chatBox', $('#c').val());
+        $('#c').val('');
+        return false;
+    });
 
     //Scrolling update status bar
     socket.on('message', function(msg){
         $('#messages').prepend($('<li>').text(msg));
+    });
+	
+	    //Scrolling update status bar
+    socket.on('chatBox', function(msg){
+        $('#chatBox').prepend($('<li>').text(msg));
     });
 
     //Disable the start button until 6 players have connected
@@ -336,13 +347,30 @@ window.onclick = function(event) {
     $('#startGame').click(function() {
         socket.emit('startGame');
     })
+	
+	    //TODO: implement startGame functionality
+    $('#chatSend').click(function() {
+        socket.emit('chatBox', $('#chatMSG input').text());
+    })
+	
 
 </script>
 <div class = "messages">
 	<div style="text-align:center"><b>Server Messages</b></div>
     <ul id="messages"></ul>
 </div>
-</div>
-<center><br><img src="https://www.jhu.edu/theme/images/logos/university-logo-small-vertical-white-no-clear-space-29e2bdee83.png" style="width: 10%; height:10%;" ></center>
+
+<div class = "chatBox">
+	<div style="text-align:center"><b>Chat Box</b></div>
+    <ul id="chatBox"></ul><input id="chatMSG" type="text" name="chatBox" size="130"> <button type ="button" id="chatSend" style="padding:2px;" >send</button>
+	<script>
+	var chatSend = document.getElementById("chatSend");
+	chatSend.onclick = function() 
+	{	
+
+}
+</script>
+</div></div>
+<center><br><img src="https://www.jhu.edu/theme/images/logos/university-logo-small-vertical-white-no-clear-space-29e2bdee83.png" style="width: 10%; height:10%;" ></center><br><br>
 </body>
 </html>

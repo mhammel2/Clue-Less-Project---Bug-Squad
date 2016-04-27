@@ -96,6 +96,13 @@ io.on('connection', function(socket){
             io.emit('gameReady', false);
 
     });
+	
+	//Allows users to select a character from the drop down box
+    socket.on('chatBox', function(msg){
+        //Emitting the message to the status update bar on the top of the page
+        io.emit('chatBox', msg);
+        //If 6 or more players are connected.  The game is ready to start
+    });
 
     //function to broadcast a disproved card
     socket.on('disprove', function(msg){
