@@ -14,16 +14,45 @@
     <script type="text/javascript" src="js/Game.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="js/main.js"></script>
-    
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script> 
+    $(function(){
+      $("#includedContent").load("instructions.html"); 
+    });
+    </script> 
+
 </head>
 <script src="/socket.io/socket.io.js"></script>
+ 
+
+
 
 <body>
-<img src="css/images/banner.png" style="    display: block;
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close">×</span>
+      <h2>Clueless Instructions</h2>
+    </div>
+    <div class="modal-body">
+    <div id="includedContent"></div>
+    </div>
+    <div class="modal-footer">
+      <h3>Developed for JHU EP EN.605.401.81 Spring 2016</h3>
+    </div>
+  </div>
+
+</div>
+
+
+<img src="css/images/banner.png" style="    display:block;
     margin: 0 auto;">
 <div style="position:relative;    margin: auto;
 top: 0px;
-    width: 1045px;
+    width: 1065px;
     background-color: rgba(0, 0, 0, 0.8);
     border: 3px solid #454545;
     padding: 10px;">
@@ -39,9 +68,9 @@ top: 0px;
 
 
 <div style="padding:5px;">
-<div class="notepad" style="width:150px; padding:5px; display:inline-block">
-     <button type = "input" id = "startGame" >Start Game!</button><br><br>
-      <button type = "input" id = "restartGame" >Restart Game!</button>
+<div class="notepad" style="width:100px; padding:5px; display:block; margin:auto; text-align:center;">
+     <button type = "input" id = "startGame" style="padding:2px;">Start Game!</button><br><br>
+      <button type = "input" id = "restartGame" style="padding:2px;">Forefeit!</button>
 </div></div>
 <img src ="/public/Board.png" style = "display:inline-block; ">
 <!--The notepad for keep deducting an accusation-->
@@ -78,16 +107,46 @@ top: 0px;
 
 <!-- Right side panel-->
 
-<div class ="notepad" style="width:150px; padding:5px; position:absolute; left: 875px; top: 5px;">
+<div class ="notepad" style="width:180px; padding:5px; position:absolute; left: 875px; top: 5px;">
     <!--TODO: append hand of cards to this list-->
+<button id="help" style="display:block;
+    margin: 0 auto; margin; padding:2px;">HELP!</button>
+    
+    <script>
+// Get the modal
+var modal = document.getElementById('myModal');
 
+// Get the button that opens the modal
+var btn = document.getElementById("help");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+    
     <div>
         <ul id = "cards"></ul>
     </div>
     <!--Dynamically create update tables here status' to maintain a tally before utilizing a GUI-->
-    <div id = "weaponTable"></div>
+    <div id = "weaponTable"></div><br><br>
     <div id = "characterTable"></div>
-    Your Current Hand </br>
+    <br><br>Your Current Hand </br>
     <select name = "myHand" id = "myHand"></select>
     <button type = "input" id ="disproveButton">Disprove!</button>
     <form>
@@ -160,7 +219,7 @@ top: 0px;
         $('#weaponTable' ).empty();
         $('#weaponTable').append('<table></table>');
         var table = $('#weaponTable').children();
-        table.append("<tr><td>Weapon</td><td>Location</td></tr>");
+        table.append("<tr><td><b>Weapon</b></td><td><b>Location</b></td></tr>");
         for(var i =0; i<weapons.length; i++){
             var row = "<tr>";
             row+="<td>" + weapons[i].name + "</td>" +
@@ -175,7 +234,7 @@ top: 0px;
         $('#characterTable' ).empty();
         $('#characterTable').append('<table></table>');
         var table = $('#characterTable').children();
-        table.append("<tr><td>Character</td><td>Location</td></tr>");
+        table.append("<tr><td><b>Character</b></td><td><b>Location</b></td></tr>");
         for(var i =0; i<characters.length; i++){
             var row = "<tr>";
             row+="<td>" + characters[i].name + "</td>" +
@@ -283,6 +342,6 @@ top: 0px;
     <ul id="messages"></ul>
 </div>
 </div>
-
+<center><br><img src="https://www.jhu.edu/theme/images/logos/university-logo-small-vertical-white-no-clear-space-29e2bdee83.png" style="width: 10%; height:10%;" ></center>
 </body>
 </html>
