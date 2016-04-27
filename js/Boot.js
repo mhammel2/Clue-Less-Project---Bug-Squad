@@ -24,4 +24,4 @@ CluelessGame.Boot.prototype = {
   
     //Start the preload state
     this.state.start('Preload');
-  }
+  }};
