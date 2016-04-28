@@ -1,6 +1,6 @@
 <!doctype html>
 <html>
-<head>
+    <head>
     <meta charset="utf-8" />
     <title>Clue-less</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,100 +19,106 @@
     $(function(){
       $("#includedContent").load("instructions.html"); 
     });
-    </script> 
+    </script>
+    </head>
+    <script src="/socket.io/socket.io.js"></script>
 
-</head>
-<script src="/socket.io/socket.io.js"></script>
- 
-
-
-
-<body>
-<!-- The Modal -->
+    <body>
 <div id="myModal" class="modal">
-
-  <!-- Modal content -->
-  <div class="modal-content">
-    <div class="modal-header">
-      <span class="close">×</span>
-      <h2>Clueless Instructions</h2>
-    </div>
+      <div class="modal-content">
+    <div class="modal-header"> <span class="close">×</span>
+          <h2>Clueless Instructions</h2>
+        </div>
     <div class="modal-body">
-    <div id="includedContent"></div>
-    </div>
+          <div id="includedContent"></div>
+        </div>
     <div class="modal-footer">
-      <h3>Developed for JHU EP EN.605.401.81 Spring 2016</h3>
-    </div>
+          <h3>Developed for JHU EP EN.605.401.81 Spring 2016</h3>
+        </div>
   </div>
-
-</div>
-
-
+    </div>
 <img src="css/images/banner.png" style="    display:block;
     margin: 0 auto;">
-<div style="position:relative;    margin: auto;
-top: 0px;
-    width: 1065px;
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 3px solid #454545;
-    padding: 10px;">
-
-<!--Drop down menu to select Character-->
-<div class= "player-game-options" style="padding:5px;">
-<div class="notepad" style="width:150px; padding:5px; display:inline-block">
-    <b>Select Character</b> </br>
-    <select name = "characters" id = "myCharacter"></select><br>
-    <button type = "button" id ="join">Join Game!</button>
-</div>
-</div>
-
-
-<div style="padding:5px;">
-<div class="notepad" style="width:100px; padding:5px; display:block; margin:auto; text-align:center;">
-     <button type = "input" id = "startGame" style="padding:2px;">Start Game!</button><br><br>
-      <button type = "input" id = "restartGame" style="padding:2px;">Forefeit!</button>
-</div></div>
-<img src ="/public/Board.png" style = "display:inline-block; ">
-<!--The notepad for keep deducting an accusation-->
-<div class="player-game-options">
-<div class = "notepad" style="width:150px;display:inline-block;">
-	<b>Detective Notes</b><br><br>
-    <b>Suspects</b> </br>
-    <input type = "checkbox" /> Col. Mustard </br>
-    <input type = "checkbox" /> Professor Plub </br>
-    <input type = "checkbox" /> Mr. Green </br>
-    <input type = "checkbox" /> Mrs. Peakcock </br>
-    <input type = "checkbox" /> Miss Scarlet </br>
-    <input type = "checkbox" /> Mrs. White </br>
-    <br><b>Weapons</b></br>
-    <input type = "checkbox" /> Knife </br>
-    <input type = "checkbox" /> Candlestick </br>
-    <input type = "checkbox" /> Revolver </br>
-    <input type = "checkbox" /> Rope </br>
-    <input type = "checkbox" /> Lead Pipe </br>
-    <input type = "checkbox" /> Wrench </br>
-  <br> <b> Room</b></br>
-    <input type = "checkbox" /> Bloomberg Center </br>
-    <input type = "checkbox" /> Peabody Library </br>
-    <input type = "checkbox" /> Bon Appetit </br>
-    <input type = "checkbox" /> Malone Hall </br>
-    <input type = "checkbox" /> Homewood Field </br>
-    <input type = "checkbox" /> Gilman Hall </br>
-    <input type = "checkbox" /> Hopkins Club </br>
-    <input type = "checkbox" /> Keyser Quad </br>
-    <input type = "checkbox" /> Residence Hall </br>
-</div>
-</div>
-
-
-<!-- Right side panel-->
-
-<div class ="notepad" style="width:180px; padding:5px; position:absolute; left: 875px; top: 5px;">
+<div style="position:relative; margin: auto;top: 0px; width: 1065px; background-color: rgba(0, 0, 0, 0.8);border: 3px solid #454545; padding: 10px;"> 
+      
+      <!--Drop down menu to select Character-->
+      <div class= "player-game-options" style="padding:5px;">
+    <div class="notepad" style="width:150px; padding:5px; display:inline-block"> <b>Select Character</b> </br>
+          <select name = "characters" id = "myCharacter">
+      </select>
+          <br>
+          <button type = "button" id ="join">Join Game!</button>
+        </div>
+  </div>
+      <div style="padding:5px;">
+    <div class="notepad" style="width:100px; padding:5px; display:block; margin:auto; text-align:center;">
+          <button type = "input" id = "startGame" style="padding:2px;">Start Game!</button>
+          <br>
+          <br>
+          <button type = "input" id = "restartGame" style="padding:2px;">Forefeit!</button>
+        </div>
+  </div>
+      <img src ="/public/Board.png" style = "display:inline-block; "> 
+      <!--The notepad for keep deducting an accusation-->
+      <div class="player-game-options">
+    <div class = "notepad" style="width:150px;display:inline-block;"> <b>Detective Notes</b><br>
+          <br>
+          <b>Suspects</b> </br>
+          <input type = "checkbox" />
+          Col. Mustard </br>
+          <input type = "checkbox" />
+          Professor Plub </br>
+          <input type = "checkbox" />
+          Mr. Green </br>
+          <input type = "checkbox" />
+          Mrs. Peakcock </br>
+          <input type = "checkbox" />
+          Miss Scarlet </br>
+          <input type = "checkbox" />
+          Mrs. White </br>
+          <br>
+          <b>Weapons</b></br>
+          <input type = "checkbox" />
+          Knife </br>
+          <input type = "checkbox" />
+          Candlestick </br>
+          <input type = "checkbox" />
+          Revolver </br>
+          <input type = "checkbox" />
+          Rope </br>
+          <input type = "checkbox" />
+          Lead Pipe </br>
+          <input type = "checkbox" />
+          Wrench </br>
+          <br>
+          <b> Room</b></br>
+          <input type = "checkbox" />
+          Bloomberg Center </br>
+          <input type = "checkbox" />
+          Peabody Library </br>
+          <input type = "checkbox" />
+          Bon Appetit </br>
+          <input type = "checkbox" />
+          Malone Hall </br>
+          <input type = "checkbox" />
+          Homewood Field </br>
+          <input type = "checkbox" />
+          Gilman Hall </br>
+          <input type = "checkbox" />
+          Hopkins Club </br>
+          <input type = "checkbox" />
+          Keyser Quad </br>
+          <input type = "checkbox" />
+          Residence Hall </br>
+        </div>
+  </div>
+      
+      <!-- Right side panel-->
+      
+      <div class ="notepad" style="width:180px; padding:5px; position:absolute; left: 875px; top: 5px;"> 
     <!--TODO: append hand of cards to this list-->
-<button class="button" id="help" style="display:block;
+    <button class="button" id="help" style="display:block;
     margin: 0 auto; margin; padding:2px;vertical-align:middle;"><span>HELP!</span></button>
-
-
     <script>
 // Get the modal
 var modal = document.getElementById('myModal');
@@ -140,61 +146,60 @@ window.onclick = function(event) {
     }
 }
 </script>
-    
     <div>
-        <ul id = "cards"></ul>
-    </div>
+          <ul id = "cards">
+      </ul>
+        </div>
     <!--Dynamically create update tables here status' to maintain a tally before utilizing a GUI-->
-    <div id = "weaponTable"></div><br><br>
+    <div id = "weaponTable"></div>
+    <br>
+    <br>
     <div id = "characterTable"></div>
-    <br><br>Your Current Hand </br>
-    <select name = "myHand" id = "myHand"></select>
+    <br>
+    <br>
+    Your Current Hand </br>
+    <select name = "myHand" id = "myHand">
+        </select>
     <button type = "input" id ="disproveButton">Disprove!</button>
     <form>
-        <!-- Drop down menus for moving and making accusations-->
-        <label for ="location">Move to:</label>
-        <select name = "location" id = "location"></select>
-        <button type = "button" id="moveButton" disabled = "disabled">Move!</button>
-        </br>
-        <span style="display:inline-block">
-        <label for ="suspects">Characters</label>
-    <select name = "suspects" id = "suspects">
-        <option value="1">Col. Mustard</option>
-        <option value="2">Professor Plum</option>
-        <option value="3">Mr. Green</option>
-        <option value="4">Mrs. Peacock</option>
-        <option value="5">Miss Scarlet</option>
-        <option value="6">Mrs. White</option>
-    </select>
-            </span>
-        <span style="display:inline-block">
-        <label for ="weapons">Weapons</label>
-        <select name = "weapons" id="weapons">
-            <option value="16">Knife</option>
-            <option value="17">Candlestick</option>
-            <option value="18">Revolver</option>
-            <option value="19">Rope</option>
-            <option value="20">Lead Pipe</option>
-            <option value="21">Wrench</option>
-        </select>
-            </span>
-        </br>
-        <button type ="button" id="suggestionButton" disabled = "disabled">Make a suggestion!</button>
-        <button type ="button" id="accusationButton" disabled = "disabled">Make an accusation!</button>
-    </form>
-    </div>
-
-
-
-<!--Place holder Board image-->
-
-
-<!--
+          <!-- Drop down menus for moving and making accusations-->
+          <label for ="location">Move to:</label>
+          <select name = "location" id = "location">
+      </select>
+          <button type = "button" id="moveButton" disabled = "disabled">Move!</button>
+          </br>
+          <span style="display:inline-block">
+      <label for ="suspects">Characters</label>
+      <select name = "suspects" id = "suspects">
+            <option value="1">Col. Mustard</option>
+            <option value="2">Professor Plum</option>
+            <option value="3">Mr. Green</option>
+            <option value="4">Mrs. Peacock</option>
+            <option value="5">Miss Scarlet</option>
+            <option value="6">Mrs. White</option>
+          </select>
+      </span> <span style="display:inline-block">
+      <label for ="weapons">Weapons</label>
+      <select name = "weapons" id="weapons">
+        <option value="16">Knife</option>
+        <option value="17">Candlestick</option>
+        <option value="18">Revolver</option>
+        <option value="19">Rope</option>
+        <option value="20">Lead Pipe</option>
+        <option value="21">Wrench</option>
+      </select>
+      </span> </br>
+          <button type ="button" id="suggestionButton" disabled = "disabled">Make a suggestion!</button>
+          <button type ="button" id="accusationButton" disabled = "disabled">Make an accusation!</button>
+        </form>
+  </div>
+      
+      <!--
     <form action="" class = "mbar">
         <input id="m" autocomplete="off" /><button>Send</button>
-    </form> -->
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-<script>
+    </form> --> 
+      <script src="http://code.jquery.com/jquery-1.11.1.js"></script> 
+      <script>
     var socket = io();
     $('form').submit(function(){
         socket.emit('message', $('#m').val());
@@ -348,29 +353,18 @@ window.onclick = function(event) {
         socket.emit('startGame');
     })
 	
-	    //TODO: implement startGame functionality
-    $('#chatSend').click(function() {
-        socket.emit('chatBox', $('#chatMSG input').text());
-    })
-	
-
 </script>
-<div class = "messages">
-	<div style="text-align:center"><b>Server Messages</b></div>
-    <ul id="messages"></ul>
-</div>
-
-<div class = "chatBox">
-	<div style="text-align:center"><b>Chat Box</b></div>
-    <ul id="chatBox"></ul><input id="chatMSG" type="text" name="chatBox" size="130"> <button type ="button" id="chatSend" style="padding:2px;" >send</button>
-	<script>
-	var chatSend = document.getElementById("chatSend");
-	chatSend.onclick = function() 
-	{	
-
-}
-</script>
-</div></div>
-<center><br><img src="https://www.jhu.edu/theme/images/logos/university-logo-small-vertical-white-no-clear-space-29e2bdee83.png" style="width: 10%; height:10%;" ></center><br><br>
+      <div class = "messages">
+    <div style="text-align:center"><b>Server Messages</b></div>
+    <ul id="messages">
+        </ul>
+  </div>
+    </div>
+<center>
+      <br>
+      <img src="https://www.jhu.edu/theme/images/logos/university-logo-small-vertical-white-no-clear-space-29e2bdee83.png" style="width: 10%; height:10%;" >
+    </center>
+<br>
+<br>
 </body>
 </html>

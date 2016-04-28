@@ -1,251 +1,225 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
-
 body {
-    font: 13px Helvetica, Arial;
-	color:				#DDDDDD;
-	background:			black url(images/background.jpg) top left no-repeat;
-	
+	font: 13px Helvetica, Arial;
+	color: #DDDDDD;
+	background: black url(images/background.jpg) top left no-repeat;
 }
-
 headerimg {
-	position: 			relative;
-	top: 				40px;
-	float:				left;
-	 background-position: 100% 100%;
-   background-repeat: no-repeat;
-	
+	position: relative;
+	top: 40px;
+	float: left;
+	background-position: 100% 100%;
+	background-repeat: no-repeat;
 }
 .suggestionButton {
-
 }
-
-.accusationButton{
-
+.accusationButton {
 }
-
-
 .board {
-    display: block;
-    margin: 0 auto;
+	display: block;
+	margin: 0 auto;
 }
-.startGame{
-
+.startGame {
 }
-.player-options{
-    float:right;
+.player-options {
+	float: right;
 	padding: 5px;
 }
-
-.player-game-options{
-    float:left;
+.player-game-options {
+	float: left;
 	padding: 5px;
 }
-
 .wrapper {
-    display:inline;
+	display: inline;
 }
 .mbar {
-    background: #000;
-    padding: 3px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+	background: #000;
+	padding: 3px;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
 }
 table {
-    border-collapse: collapse;
+	border-collapse: collapse;
 }
 td {
-    width: 120px;
+	width: 120px;
 }
 table, td, th {
-    border: 1px solid black;
+	border: 1px solid black;
 }
 .notepad {
 	padding: 5px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	max-width: 170px;
-	
 }
-
 .messages {
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	padding: 5px;
-
 }
 .chatBox {
-    background-color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	padding: 5px;
-
 }
-label{
-    display:block;
+label {
+	display: block;
 }
 form input {
-    border: 0;
-    padding: 10px;
-    width: 90%;
-    margin-right: .5%;
+	border: 0;
+	padding: 10px;
+	width: 90%;
+	margin-right: .5%;
 }
-
 #messages {
-    height: 100px;
-    overflow: hidden;
-    overflow-y: scroll;
-    margin: 0;
-    padding: 0;
+	height: 100px;
+	overflow: hidden;
+	overflow-y: scroll;
+	margin: 0;
+	padding: 0;
 }
-
 #messages li {
-    padding: 5px 10px;
+	padding: 5px 10px;
 }
-
 #messages li:nth-child(odd) {
-    background: rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.8);
 }
-
 #chatBox {
-    height: 100px;
-    overflow: hidden;
-    overflow-y: scroll;
-    margin: 0;
-    padding: 0;
+	height: 100px;
+	overflow: hidden;
+	overflow-y: scroll;
+	margin: 0;
+	padding: 0;
 }
-
 #chatBox li {
-    padding: 5px 10px;
+	padding: 5px 10px;
 }
-
 #chatBox li:nth-child(odd) {
-    background: rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.8);
 }
-
 /* The Modal (background) */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
-
 /* Modal Content/Box */
 .modal-content {
-
-
-    margin: 15% auto; /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+	margin: 15% auto; /* 15% from the top and centered */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%; /* Could be more or less, depending on screen size */
 }
-
 /* The Close Button */
 .close {
-    color: #FF0000;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+	color: #FF0000;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
 }
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+.close:hover, .close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
 }
-
 /* Modal Header */
 .modal-header {
-    padding: 2px 16px;
-    background-color: #000000;
-    color: white;
+	padding: 2px 16px;
+	background-color: #000000;
+	color: white;
 }
-
 /* Modal Body */
-.modal-body {padding: 2px 16px;}
-
+.modal-body {
+	padding: 2px 16px;
+}
 /* Modal Footer */
 .modal-footer {
-    padding: 2px 16px;
-    background-color: #000000;
-    color: white;
+	padding: 2px 16px;
+	background-color: #000000;
+	color: white;
 }
-
 /* Modal Content */
 .modal-content {
-    position: relative;
-    background-color: #fefefe;
-    margin: auto;
-    padding: 0;
-    border: 1px solid #888;
-    width: 80%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 0.4s;
+	position: relative;
+	background-color: #fefefe;
+	margin: auto;
+	padding: 0;
+	border: 1px solid #888;
+	width: 80%;
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+	-webkit-animation-name: animatetop;
+	-webkit-animation-duration: 0.4s;
+	animation-name: animatetop;
+	animation-duration: 0.4s;
 	color: black;
 }
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from {top: -300px; opacity: 0} 
-    to {top: 0; opacity: 1}
+ from {
+top: -300px;
+opacity: 0
 }
-
-@keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
+to {
+	top: 0;
+	opacity: 1
 }
-
-
+}
+ @keyframes animatetop {
+ from {
+top: -300px;
+opacity: 0
+}
+to {
+	top: 0;
+	opacity: 1
+}
+}
 .button {
-  display: inline-block;
-  border-radius: 4px;
-  background-color: #FF000D;
-  border: none;
-  color: #FFFFFF;
-  text-align: center;
-  font-size: 14px;
-  padding: 5px;
-  width: auto;
-  transition: all 0.5s;
-  cursor: pointer;
-  margin: 5px;
+	display: inline-block;
+	border-radius: 4px;
+	background-color: #FF000D;
+	border: none;
+	color: #FFFFFF;
+	text-align: center;
+	font-size: 14px;
+	padding: 5px;
+	width: auto;
+	transition: all 0.5s;
+	cursor: pointer;
+	margin: 5px;
 }
-
 .button span {
-  cursor: pointer;
-  display: inline-block;
-  position: relative;
-  transition: 0.5s;
+	cursor: pointer;
+	display: inline-block;
+	position: relative;
+	transition: 0.5s;
 }
-
 .button span:after {
-  content: '»';
-  position: absolute;
-  opacity: 0;
-  top: 0;
-  right: -20px;
-  transition: 0.5s;
+	content: '»';
+	position: absolute;
+	opacity: 0;
+	top: 0;
+	right: -20px;
+	transition: 0.5s;
 }
-
 .button:hover span {
-  padding-right: 25px;
+	padding-right: 25px;
 }
-
 .button:hover span:after {
-  opacity: 1;
-  right: 0;
+	opacity: 1;
+	right: 0;
 }
