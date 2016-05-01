@@ -160,8 +160,9 @@ window.onclick = function(event) {
     Your Current Hand </br>
     <select name = "myHand" id = "myHand">
         </select>
-    <button type = "input" id ="disproveButton">Disprove!</button>
-    <form>
+    <button type = "input" id ="disproveButton" disabled = "disabled">Disprove!</button>
+    <button type = "input" id ="passDisprove" disabled = "disabled">Pass</button>
+          <form>
           <!-- Drop down menus for moving and making accusations-->
           <label for ="location">Move to:</label>
           <select name = "location" id = "location">
@@ -170,14 +171,7 @@ window.onclick = function(event) {
           </br>
           <span style="display:inline-block">
       <label for ="suspects">Characters</label>
-      <select name = "suspects" id = "suspects">
-            <option value="1">Col. Mustard</option>
-            <option value="2">Professor Plum</option>
-            <option value="3">Mr. Green</option>
-            <option value="4">Mrs. Peacock</option>
-            <option value="5">Miss Scarlet</option>
-            <option value="6">Mrs. White</option>
-          </select>
+      <select name = "suspects" id = "suspects"></select>
       </span> <span style="display:inline-block">
       <label for ="weapons">Weapons</label>
       <select name = "weapons" id="weapons">
@@ -260,14 +254,24 @@ window.onclick = function(event) {
             table.append(row);
 
         }
+        $('#suspects').empty();
+        for(var j = 0; j < characters.length; j++) {
+            $('#suspects').append($('<option>', {
+                value: characters[j].id,
+                text: characters[j].name
+            }));
+        }
     });
 
     //Append the list of Available players to the drop down menu
-    socket.on('viewPlayers', function(player){
-        $('#myCharacter').append($('<option>', {
-            value:player[0],
-            text:player[1]
-        }));
+    socket.on('viewPlayers', function(players){
+        $('#myCharacter').empty();
+        for(var i = 0; i < players.length; i++) {
+            $('#myCharacter').append($('<option>', {
+                value: players[i][0],
+                text: players[i][1]
+            }));
+        }
     });
 
     //populate the players hand on the screen
@@ -343,12 +347,24 @@ window.onclick = function(event) {
 
     });
 
+    //Enabling the disprove button when it is turn to disprove
+    socket.on('enableDisprove', function(){
+        $('#disproveButton').prop("disabled", false);
+        $('#passDisprove').prop("disabled", false);
+    });
+
     //Setting up the disprove button to broadcast their chosen card
     $('#disproveButton').click(function() {
         socket.emit('disprove', $('#myHand option:selected').text());
+        $('#disproveButton').prop("disabled", true);
+        $('#passDisprove').prop("disabled", true);
     });
 
-    //TODO: implement startGame functionality
+    $('#passDisprove').click(function() {
+       socket.emit('disprove', "No card");
+        $('#disproveButton').prop("disabled", true);
+        $('#passDisprove').prop("disabled", true);
+    });
     $('#startGame').click(function() {
         socket.emit('startGame');
     })
