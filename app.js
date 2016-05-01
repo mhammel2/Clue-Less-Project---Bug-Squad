@@ -27,6 +27,10 @@ var weapons = [];
 //count to track the turns
 var count = 0;
 
+//count for tracking the disproving
+var dindex;
+var dj;
+
 //setting up the cardset Object
 function CardSet(character, room, weapon){
     this.character = character;
@@ -37,8 +41,7 @@ function CardSet(character, room, weapon){
 io.on('connection', function(socket){
     //First populate the available players to choose from.
     io.emit('resetPlayers');
-    for(var i = 0; i < availPlayers.length; i++)
-        io.emit('viewPlayers', availPlayers[i]);
+    io.emit('viewPlayers', availPlayers);
     
     //Not ready unless 3-6 players are playing
     if(players.length >= 3  && players.length <= 6)
@@ -56,18 +59,6 @@ io.on('connection', function(socket){
         }
     });
 
-
-
-    /**  Original messaging code lines left in
-    socket.on('message', function(msg){
-        for (var i = 0; i < players.length; i++) {
-            if (players[i].socket == socket.id) {
-                io.emit('message', 'Player ' + players[i].id + ': ' + msg);
-            }
-        }
-
-    });*/
-
     //Allows users to select a character from the drop down box
     socket.on('select-character', function(msg){
         //Emitting the message to the status update bar on the top of the page
@@ -75,6 +66,7 @@ io.on('connection', function(socket){
         //If 6 or more players are connected.  The game is ready to start
 
         //Creating a new player instance
+
         var player = new Player(playerNum, msg, socket.id);
         playerNum++;
 
@@ -89,17 +81,14 @@ io.on('connection', function(socket){
         }
         players.push(player);
 
+        io.emit('viewPlayers', availPlayers);
+
         //Can't start unless there are 3-6 players
         if(players.length >= 3  && players.length <= 6)
             io.emit('gameReady', true);
         else
             io.emit('gameReady', false);
 
-    });
-	
-    //function to broadcast a disproved card
-    socket.on('disprove', function(msg){
-        io.emit('message', msg + ' has been used to disprove the suggestion!');
     });
 
     //TODO: Implement start game functions
@@ -130,7 +119,7 @@ io.on('connection', function(socket){
         shuffle(deck);
 
         //passing the three cards to the players
-        for(var i = 0; i < 6; i++)
+        for(var i = 0; i < players.length; i++)
         {
             for(var j = 0; j < 3; j++ )
             {
@@ -139,7 +128,7 @@ io.on('connection', function(socket){
         }
 
         //populating the players hands on their screens
-        for(var i = 0; i < 6; i++)
+        for(var i = 0; i < players.length; i++)
         {
             io.to(players[i].socket).emit('deck',players[i].hand);
         }
@@ -148,12 +137,11 @@ io.on('connection', function(socket){
 
 
         //populate the rooms with the starting locations
-        players[0].character.location = board[players[0].character.locationID];
-        players[1].character.location = board[players[1].character.locationID];
-        players[2].character.location = board[players[2].character.locationID];
-        players[3].character.location = board[players[3].character.locationID];
-        players[4].character.location = board[players[4].character.locationID];
-        players[5].character.location = board[players[5].character.locationID];
+        for(var i = 0; i < players.length; i++)
+        {
+            players[i].character.location = board[players[i].character.locationID];
+        }
+
         board[1].addPlayer(Scarlet);
 
         board[2].addPlayer(Mustard);
@@ -177,7 +165,7 @@ io.on('connection', function(socket){
         io.emit('updateCharacters', characters);
 
         game = new Game(board, solution);
-        updateGame();
+        updateGame(true);
 
 
     });
@@ -201,13 +189,15 @@ io.on('connection', function(socket){
         players[index].character.location = board[players[index].character.locationID];
         board[id].addPlayer(players[index].character);
 
-        if (board[id] instanceof Room)
+        if (board[id] instanceof Room) {
             io.to(players[index].socket).emit('makeSuggestion', true);
-        else
+            io.emit('message', players[index].character.name +"'s turn to make a suggestion");
+            updateGame(false);
+        }
+        else {
             io.to(players[index].socket).emit('makeSuggestion', false);
-
-        updateGame();
-
+            updateGame(true);
+        }
     });
 
     //Method to process the suggestion of a player
@@ -249,10 +239,45 @@ io.on('connection', function(socket){
 
         //moving the weapon to the suggested location
         weapons[weaponIndex].location = board[boardID];
-        updateGame();
 
+        //Updating the room locations
+        updateGame(false);
+
+        //Beginning the disproveLoop
+        dindex = index;
+        dj = index+1;
+        disproveLoop();
     });
 
+    //To loop through the players to disprove suggestions
+    var disproveLoop = function(msg){
+
+        if(msg)
+            io.to(players[dindex].socket).emit('message', msg + ' has been used to disprove the suggestion!');
+        //recycling the player loops at index 0
+        if(dj == players.length) dj = 0;
+
+        //check if the disproveLoop is complete
+        if(dindex == dj) {
+            gameLoop();
+            return;
+        }
+
+        //Broadcasting to the board the game is complete
+        io.emit('message', players[dj].character.name + "'s turn to disprove");
+
+        //Enabling the character's disproveButton
+        io.to(players[dj].socket).emit('enableDisprove');
+
+        //function to broadcast a disproved card
+    };
+
+    socket.on('disprove', function(msg){
+        dj++;
+        disproveLoop(msg);
+    });
+
+    //Player accusation function
     socket.on('playerAccusation', function(cards){
         var weaponID = cards[0];
         var characterID = cards[1];
@@ -263,15 +288,18 @@ io.on('connection', function(socket){
         }
         var boardID = players[index].character.locationID;
         var win = (characterID == solution[0].id && boardID == solution[1].id && weaponID == solution[2].id);
-        console.log('characterID= ' + characterID+ 'soution0ID = ' + solution[0].id + 'boardID =' + boardID + 'solution1ID= ' + solution[1].id + 'weaponID = ' + weaponID + 'solution2ID = ' + solution[2].id);
+        console.log('characterID= ' + characterID+ 'soution=ID = ' + solution[0].id + 'boardID =' + boardID + 'solution1ID= ' + solution[1].id + 'weaponID = ' + weaponID + 'solution2ID = ' + solution[2].id);
         if(win)
             io.emit('message', players[index].character.name + ' wins!');
         else
             io.emit('message', players[index].character.name + ' looses!');
     });
 
+
+
     //Update the character and weapon tables on the client page
-    var updateGame = function()
+    //progress is a boolean which enables progression of the game
+    var updateGame = function(progress)
     {
         characters = [];
          for(var i = 0; i< players.length; i++)
@@ -280,12 +308,12 @@ io.on('connection', function(socket){
          }
            io.emit('updateWeapons', weapons);
            io.emit('updateCharacters', characters);
-        gameLoop();
+        if(progress)gameLoop();
     };
 
     //gameLoop to prompt users to make a move
     var gameLoop = function() {
-            if(count == 6)
+            if(count == players.length)
                 count = 0;
 
             //To populate the list of available rooms to the active player
@@ -306,18 +334,10 @@ io.on('connection', function(socket){
             }
                 //populate the makeMove dropdown menu
             else {
+                io.emit('message', players[count].character.name + "'s turn to move!");
                 io.to(players[count++].socket).emit('makeMove', rooms);
             }
     };
-
-    var makeAccusation = function () {
-
-    };
-
-    var makeSuggestion = function () {
-
-    };
-
 
 });
 
@@ -439,23 +459,23 @@ function populateBoard() {
     board.push(h10);
     h11 = new Hallway(11, "Hallway 11", [19, 20]);
     board.push(h11);
-    r12 = new Room(12, "Study", [0,1,8], 15);
+    r12 = new Room(12, "Bloomberg Center", [0,1,8], 15);
     board.push(r12);
-    r13 = new Room(13, "Hall", [0,7,16], 7);
+    r13 = new Room(13, "Peabody Center", [0,7,16], 7);
     board.push(r13);
-    r14 = new Room(14, "Lounge", [1,2,18], 8);
+    r14 = new Room(14, "Bon Appetit", [1,2,18], 8);
     board.push(r14);
-    r15 = new Room(15, "Dining Room", [2,3,9], 9);
+    r15 = new Room(15, "Gilman Hall", [2,3,9], 9);
     board.push(r15);
-    r16 = new Room(16, "Kitchen", [3,4,12], 10);
+    r16 = new Room(16, "Residence Hall", [3,4,12], 10);
     board.push(r16);
-    r17 = new Room(17, "Ballroom", [4,5,10], 11);
+    r17 = new Room(17, "Keyser Quad", [4,5,10], 11);
     board.push(r17);
-    r18 = new Room(18, "Conservatory", [5,6,14], 12);
+    r18 = new Room(18, "Hopkins Club", [5,6,14], 12);
     board.push(r18);
-    r19 = new Room(19, "Library", [6,7,11], 14);
+    r19 = new Room(19, "Malone Hall", [6,7,11], 14);
     board.push(r19);
-    r20 = new Room(20, "Billiard Room", [8,9,10,11], 13);
+    r20 = new Room(20, "Homewood Field", [8,9,10,11], 13);
     board.push(r20);
     return board;
 }
