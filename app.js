@@ -107,7 +107,7 @@ io.on('connection', function(socket){
         solution.push(deck[weaponIndex]);
 
         //broadcasting the solution message, to be deleted later
-        io.emit('message', 'Solution: ' + solution[0].name + ' ' + solution[1].name + ' '
+        console.log('Solution: ' + solution[0].name + ' ' + solution[1].name + ' '
             + solution[2].name);
 
 
@@ -142,17 +142,17 @@ io.on('connection', function(socket){
             players[i].character.location = board[players[i].character.locationID];
         }
 
-        board[1].addPlayer(Scarlet);
+        board[21].addPlayer(Scarlet);
 
-        board[2].addPlayer(Mustard);
+        board[22].addPlayer(Mustard);
 
-        board[4].addPlayer(White);
+        board[23].addPlayer(White);
 
-        board[5].addPlayer(Green);
+        board[24].addPlayer(Green);
 
-        board[6].addPlayer(Peacock);
+        board[25].addPlayer(Peacock);
 
-        board[7].addPlayer(Plum);
+        board[26].addPlayer(Plum);
 
         weapons.push(new Weapon_Piece(20, "lead pipe", board[13]));
         weapons.push(new Weapon_Piece(18, "revolver", board[14]));
@@ -172,7 +172,6 @@ io.on('connection', function(socket){
 
     //Method to move a player
     socket.on('movePlayer', function(id){
-        console.log('Move Player being called');
         //getting the id to identify a player
         var playerID = socket.id;
         var index;
@@ -206,16 +205,21 @@ io.on('connection', function(socket){
         var characterID = cards[1];
         var index;
         var j;
+        var found = false;
         //finding the player who made the suggestion
         for (index = 0; index < players.length; index++) {
-            if (players[index].socket == socket.id)
+            if (players[index].socket == socket.id) {
+
                 break;
+            }
         }
         //finding the id of the player who is being suspected
         for (j = 0; j < players.length; j++)
         {
-            if(players[j].character.id == characterID)
+            if(players[j].character.id == characterID) {
+                found = true;
                 break;
+            }
         }
 
         //finding the weapon passed as a parameter
@@ -228,15 +232,16 @@ io.on('connection', function(socket){
         //finding the boardID
         var boardID = players[index].character.locationID;
         io.emit('message', players[index].character.name +
-            ' suggests the murder took place by ' + players[j].character.name +
+            ' suggests the murder took place by ' + cards[2] +
         ' at the ' + board[boardID].name + ' by using the ' + weapons[weaponIndex].name);
 
         //moving the player to the suggested location
-        board[players[j].character.locationID].removePlayer(players[j].character);
-        players[j].character.locationID = boardID;
-        players[j].character.location = board[players[j].character.locationID];
-        board[boardID].addPlayer(players[j].character);
-
+        if(found == true) {
+            board[players[j].character.locationID].removePlayer(players[j].character);
+            players[j].character.locationID = boardID;
+            players[j].character.location = board[players[j].character.locationID];
+            board[boardID].addPlayer(players[j].character);
+        }
         //moving the weapon to the suggested location
         weapons[weaponIndex].location = board[boardID];
 
@@ -288,11 +293,14 @@ io.on('connection', function(socket){
         }
         var boardID = players[index].character.locationID;
         var win = (characterID == solution[0].id && boardID == solution[1].id && weaponID == solution[2].id);
-        console.log('characterID= ' + characterID+ 'soution=ID = ' + solution[0].id + 'boardID =' + boardID + 'solution1ID= ' + solution[1].id + 'weaponID = ' + weaponID + 'solution2ID = ' + solution[2].id);
-        if(win)
+        if(win) {
             io.emit('message', players[index].character.name + ' wins!');
-        else
+        }
+        else {
             io.emit('message', players[index].character.name + ' looses!');
+            players.splice(index,1);
+            gameLoop();
+        }
     });
 
 
@@ -345,7 +353,7 @@ server.listen(8080, function () {
     var host = "localhost";
     var port = server.address().port;
 
-    console.log('Example app listening at http://%s:%s', host, port);
+    console.log('ClueLess server listening at http://%s:%s', host, port);
 });
 
 //Use anything from this root folder
@@ -435,37 +443,37 @@ Room.prototype.constructor = Room;
 function populateBoard() {
 
     var board = [];
-    h0 = new Hallway(0, "Hallway 0", [12, 13]);
+    h0 = new Hallway(0, "Hallway 1", [12, 13]);
     board.push(h0);
-    h1 = new Hallway(1, "Hallway 1", [13, 14]);
+    h1 = new Hallway(1, "Hallway 2", [13, 14]);
     board.push(h1);
-    h2 = new Hallway(2, "Hallway 2", [14, 15]);
+    h2 = new Hallway(2, "Hallway 3", [14, 15]);
     board.push(h2);
-    h3 = new Hallway(3, "Hallway 3", [15, 16]);
+    h3 = new Hallway(3, "Hallway 4", [15, 16]);
     board.push(h3);
-    h4 = new Hallway(4, "Hallway 4", [16, 17]);
+    h4 = new Hallway(4, "Hallway 5", [16, 17]);
     board.push(h4);
-    h5 = new Hallway(5, "Hallway 5", [17, 18]);
+    h5 = new Hallway(5, "Hallway 6", [17, 18]);
     board.push(h5);
-    h6 = new Hallway(6, "Hallway 6", [18, 19]);
+    h6 = new Hallway(6, "Hallway 7", [18, 19]);
     board.push(h6);
-    h7 = new Hallway(7, "Hallway 7", [19, 12]);
+    h7 = new Hallway(7, "Hallway 8", [19, 12]);
     board.push(h7);
-    h8 = new Hallway(8, "Hallway 8", [13, 20]);
+    h8 = new Hallway(8, "Hallway 9", [13, 20]);
     board.push(h8);
-    h9 = new Hallway(9, "Hallway 9", [15, 20]);
+    h9 = new Hallway(9, "Hallway 10", [15, 20]);
     board.push(h9);
-    h10 = new Hallway(10, "Hallway 10", [17, 20]);
+    h10 = new Hallway(10, "Hallway 11", [17, 20]);
     board.push(h10);
-    h11 = new Hallway(11, "Hallway 11", [19, 20]);
+    h11 = new Hallway(11, "Hallway 12", [19, 20]);
     board.push(h11);
     r12 = new Room(12, "Bloomberg Center", [0,1,8], 15);
     board.push(r12);
-    r13 = new Room(13, "Peabody Center", [0,7,16], 7);
+    r13 = new Room(13, "Peabody Library", [0,7,16], 7);
     board.push(r13);
     r14 = new Room(14, "Bon Appetit", [1,2,18], 8);
     board.push(r14);
-    r15 = new Room(15, "Gilman Hall", [2,3,9], 9);
+    r15 = new Room(15, "Gillman Hall", [2,3,9], 9);
     board.push(r15);
     r16 = new Room(16, "Residence Hall", [3,4,12], 10);
     board.push(r16);
@@ -477,6 +485,18 @@ function populateBoard() {
     board.push(r19);
     r20 = new Room(20, "Homewood Field", [8,9,10,11], 13);
     board.push(r20);
+    r21 = new Hallway(21, "White Start", [0]);
+    board.push(r21);
+    r22 = new Hallway(22, "Green Start", [1]);
+    board.push(r22);
+    r23 = new Hallway(23, "Peacock Start", [2]);
+    board.push(r23);
+    r24 = new Hallway(24, "Plum Start", [3]);
+    board.push(r24);
+    r25 = new Hallway(25, "Scarlett Start", [5]);
+    board.push(r25);
+    r26 = new Hallway(26, "Mustard Start", [6]);
+    board.push(r26);
     return board;
 }
 
@@ -544,19 +564,19 @@ Character.prototype = Object.create(Card.prototype);
 //the through the indices 0-5 for Character,6-15 for Location, and 15-21 for Weapon
 function populateDeck() {
     var deck = [];
-    Mustard = new Character(id = 1, name = "Col. Mustard", 2);
+    Mustard = new Character(id = 1, name = "Col. Mustard", 26);
     deck.push(Mustard);
-    Plum = new Character(id = 2, name = "Professor Plum", 7);
+    Plum = new Character(id = 2, name = "Professor Plum", 24);
     deck.push(Plum);
-    Green = new Character(id = 3, name = "Mr. Green", 5);
+    Green = new Character(id = 3, name = "Mr. Green", 22);
     deck.push(Green);
-    Peacock = new Character(id = 4, name = "Mrs. Peacock", 6);
+    Peacock = new Character(id = 4, name = "Mrs. Peacock", 23);
     deck.push(Peacock);
-    Scarlet = new Character(id = 5, name = "Miss Scarlet", 1);
+    Scarlet = new Character(id = 5, name = "Miss Scarlet", 25);
     deck.push(Scarlet);
-    White = new Character(id = 6, name = "Mrs. White", 4);
+    White = new Character(id = 6, name = "Mrs. White", 21);
     deck.push(White);
-    Hall = new Location(id = 13, name = "Hall", Plum);
+    Hall = new Location(id = 13, name = "Peabody Library");
     deck.push(Hall);
     Lounge = new Location(id = 14, name = "Bon Appetit");
     deck.push(Lounge);
