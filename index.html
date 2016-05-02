@@ -171,7 +171,14 @@ window.onclick = function(event) {
           </br>
           <span style="display:inline-block">
       <label for ="suspects">Characters</label>
-      <select name = "suspects" id = "suspects"></select>
+      <select name = "suspects" id = "suspects">
+              <option value="1">Col. Mustard</option>
+        <option value="2">Professor Plum</option>
+        <option value="3">Mr. Green</option>
+        <option value="4">Mrs. Peacock</option>
+        <option value="5">Miss Scarlet</option>
+        <option value="6">Mrs. White</option>
+          </select>
       </span> <span style="display:inline-block">
       <label for ="weapons">Weapons</label>
       <select name = "weapons" id="weapons">
@@ -254,13 +261,8 @@ window.onclick = function(event) {
             table.append(row);
 
         }
-        $('#suspects').empty();
-        for(var j = 0; j < characters.length; j++) {
-            $('#suspects').append($('<option>', {
-                value: characters[j].id,
-                text: characters[j].name
-            }));
-        }
+
+
     });
 
     //Append the list of Available players to the drop down menu
@@ -302,8 +304,10 @@ window.onclick = function(event) {
         var cards = [];
         weaponID = $('#weapons').val();
         characterID = $('#suspects').val();
+        characterName = $('#myCharacter option:selected').text();
         cards.push(weaponID);
         cards.push(characterID);
+        cards.push(characterName);
         $('#suggestionButton').prop("disabled", true);
         $('#accusationButton').prop("disabled", true);
         socket.emit('playerSuggestion',cards);
@@ -313,8 +317,10 @@ window.onclick = function(event) {
         var cards = [];
         weaponID = $('#weapons').val();
         characterID = $('#suspects').val();
+        characterName = $('#myCharacter option:selected').text();
         cards.push(weaponID);
         cards.push(characterID);
+        cards.push(characterName);
         $('#suggestionButton').prop("disabled", true);
         $('#accusationButton').prop("disabled", true);
         socket.emit('playerAccusation',cards);
